@@ -10,24 +10,30 @@ url = "http://gepro.nl/roosters/rooster.php?leerling=" + str(leerlingnummer) + "
 htmlPage = urllib2.urlopen(url).read()
 parts = []
 stage = 0
-pattern = re.compile('class="tableCell(New|Removed)">(y([0-9]+)|[a-z]+)')
-for string in re.finditer(pattern, htmlPage):
-    if string.group(1) == "Removed":
-        parts.append(string.group(2))
+changePat = re.compile('class="tableCell(New|Removed)">(y([0-9]+)|[a-z]+)')
+hourPat = re.compile('width="50" class="tableHeader">([0-9])e uur')
+for change in re.finditer(changePat, htmlPage):
+    if change.group(1) == "Removed":
+        parts.append([change.group(2)])
+        hour = re.findall(hourPat, htmlPage[:change.start()])[-1]
+        parts[-1].append(hour)
     else:
         stage += 1
         if stage == 1:
-            parts.append([string.group(2)])
+            parts.append([change.group(2)])
         else:
-            parts[-1].append(string.group(2))
+            parts[-1].append(change.group(2))
         if stage == 3:
             stage = 0
+            hour = re.findall(hourPat, htmlPage[:change.start()])[-1]
+            parts[-1].append(hour)
 
 text = ""
 for part in parts:
-    if len(part) == 3:
-        text += part[0] + " " + part[1] + " " + part[2] + "\n"
+    if len(part) == 4:
+        text += part[-1] + "e uur " + part[0] + " " + part[1] + " " + part[2] + "\n"
     else:
-        text += part + "\n"
+        text += part[-1] + "e uur " + part[0] + "\n"
 
-success, push = pb.push_note("Rooster wijzigingen", text)
+print text
+#success, push = pb.push_note("Rooster wijzigingen", text)
