@@ -2,10 +2,10 @@ import urllib2, re
 from pushbullet import PushBullet
 from operator import itemgetter
 
-api_key = "v1vPiFeYJ9xD5ueb9OYzoC20zVE8z4m5BPujxa3ey3kdw"
-pb = PushBullet(api_key)
+key = "v1vPiFeYJ9xD5ueb9OYzoC20zVE8z4m5BPujxa3ey3kdw"
+pb = PushBullet(key)
 
-leerlingnummer = 1101625
+leerlingnummer = 1102053
 
 url = "http://gepro.nl/roosters/rooster.php?leerling=" + str(
     leerlingnummer) + "&type=Leerlingrooster&afdeling=schooljaar2014-2015_OVERIG&wijzigingen=1&school=1814"
@@ -47,5 +47,5 @@ for part in parts:
     else:
         text += part[0] + "\n"
 
-print text
-# success, push = pb.push_note("Rooster wijzigingen", text)
+# print text
+success, push = pb.push_note("Rooster wijzigingen", text)
