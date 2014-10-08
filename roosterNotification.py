@@ -5,7 +5,7 @@ htmlPage = urllib2.urlopen(url).read()
 
 pattern = re.compile('class="tableCell(Removed|New)">(y([0-9]+)|[a-z]+|[0-9])')
 for part in re.finditer(pattern, htmlPage):
-    print part.group(2)
+    print part.group()
 
 
 # done = False
