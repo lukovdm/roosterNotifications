@@ -15,6 +15,9 @@ stage = 0
 changePat = re.compile('class="tableCell(New|Removed)">(y([0-9]+)|[a-z]+)')
 hourPat = re.compile('width="50" class="tableHeader">([0-9])e uur')
 dayPat = re.compile('<td align="left" width="auto" class="tableCell">')
+# lastChangedPat = re.compile('<font class="fntprompt">[&nbsp;]([0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9] [0-9][0-9]:' +
+                            '[0-9][0-9]:[0-9][0-9])[&nbsp;]')
+
 for change in re.finditer(changePat, htmlPage):
     if change.group(1) == "Removed":
         parts.append([change.group(2)])
@@ -23,6 +26,7 @@ for change in re.finditer(changePat, htmlPage):
         parts[-1].append(hour.group(1))
         day = re.findall(dayPat, htmlPage[hour.end():change.start()])
         parts[-1].append(len(day))
+        parts[-1].append(re.match(lastChangedPat, htmlPage).group(1))
     else:
         stage += 1
         if stage == 1:
@@ -36,12 +40,13 @@ for change in re.finditer(changePat, htmlPage):
             parts[-1].append(hour.group(1))
             day = re.findall(dayPat, htmlPage[hour.end():change.start()])
             parts[-1].append(len(day))
+            parts[-1].append(re.match(lastChangedPat, htmlPage).group(1))
 
 days = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag"]
 text = ""
 parts = sorted(parts, key=itemgetter(-1))
 for part in parts:
-    text += str(days[part[-1]-1]) + " " + part[-2] + "e uur "
+    text += str(days[part[-2]-1]) + " " + part[-3] + "e uur "
     if len(part) == 5:
         text += part[0] + " " + part[1] + " " + part[2] + "\n"
     else:
